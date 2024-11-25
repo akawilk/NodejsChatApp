@@ -12,7 +12,7 @@ stage('Cloning Git')
 
     snykSecurity(
         snykInstallation:'Snyk',
-        snykTokenId: 'synk_api',
+        snykTokenId: 'Synkid',
         severity: 'critical'
     )
  }
