@@ -44,7 +44,8 @@ stage('Pull-Image-Run-App') {
         fi
         '''
 }
- 
+
+}
 stage('Deploy')
 {
     sh "docker-compose down"
