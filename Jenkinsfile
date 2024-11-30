@@ -1,37 +1,32 @@
-node('Ubuntu-Appserver-3120')
-{
- 
-def app
-stage('Cloning Git')
-{
-    /* Let's make sure we have the repository cloned to our workspace */
-    checkout scm
-}
-
- stage('SCA-SAST-SNYK-TEST'){
-
-    snykSecurity(
-        snykInstallation:'Snyk',
-        snykTokenId: 'Synkid',
-        severity: 'critical'
-    )
- }
-stage('Build-And-Tag-')
-{
-    /* This builds the actual image; 
-         * This is synonymous to docker build on the command line */
-    app = docker.build('akawilk90/nodejschatapp')
-}
- 
-stage('Push-to-dockerhub')
-{
-    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds-2')
-    {
-        app.push('latest')
+node('Ubuntu-Appserver-3120') {
+    def app
+    
+    stage('Cloning Git') {
+        /* Let's make sure we have the repository cloned to our workspace */
+        checkout scm
     }
-}
 
-stage('Pull-Image-Run-App') {
+    stage('SCA-SAST-SNYK-TEST') {
+        snykSecurity(
+            snykInstallation: 'Snyk',
+            snykTokenId: 'Synkid',
+            severity: 'critical'
+        )
+    }
+
+    stage('Build-And-Tag-') {
+        /* This builds the actual image;
+         * This is synonymous to docker build on the command line */
+        app = docker.build('akawilk90/nodejschatapp')
+    }
+
+    stage('Push-to-dockerhub') {
+        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds-2') {
+            app.push('latest')
+        }
+    }
+
+    stage('Pull-Image-Run-App') {
         // Find and stop any Docker container using port 80
         sh '''
         CONTAINER_ID=$(docker ps -q --filter "publish=80")
@@ -43,12 +38,11 @@ stage('Pull-Image-Run-App') {
             echo "No container using port 80."
         fi
         '''
+    }
+
+    stage('Deploy') {
+        sh "docker-compose down"
+        sh "docker-compose up -d"
+    }
 }
 
-}
-stage('Deploy')
-{
-    sh "docker-compose down"
-    sh "docker-compose up -d"
-}
- 
