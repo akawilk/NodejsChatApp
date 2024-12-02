@@ -6,7 +6,7 @@ node('Ubuntu-Appserver-3120') {
         checkout scm
     }
 
-    stage('SCA-SAST-SNYK-TEST') {
+    stage('SCA & SAST') {
         snykSecurity(
             snykInstallation: 'Snyk',
             snykTokenId: 'Synkid',
